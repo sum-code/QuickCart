@@ -11,6 +11,7 @@ import com.quickcart.user.entity.AppRole;
 import com.quickcart.user.entity.Role;
 import com.quickcart.user.repository.AppUserRepository;
 import com.quickcart.user.repository.AppRoleRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -30,19 +30,22 @@ public class AuthServiceImpl implements AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
 	private final JwtService jwtService;
+	private final String adminRegistrationCode;
 
 	public AuthServiceImpl(
 			AppUserRepository userRepository,
 			AppRoleRepository roleRepository,
 			PasswordEncoder passwordEncoder,
 			AuthenticationManager authenticationManager,
-			JwtService jwtService
+			JwtService jwtService,
+			@Value("${app.admin.registration.code:}") String adminRegistrationCode
 	) {
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.authenticationManager = authenticationManager;
 		this.jwtService = jwtService;
+		this.adminRegistrationCode = adminRegistrationCode == null ? "" : adminRegistrationCode.trim();
 	}
 
 	@Override
@@ -52,13 +55,15 @@ public class AuthServiceImpl implements AuthService {
 			throw new IllegalArgumentException("Email already registered");
 		}
 
-		Set<Role> roleNames = request.getRoles();
-		if (roleNames == null || roleNames.isEmpty()) {
-			roleNames = Set.of(Role.USER);
-		} else {
-			roleNames = new HashSet<>(roleNames);
+		Role requestedRole = request.getRole() == null ? Role.USER : request.getRole();
+		if (requestedRole == Role.ADMIN) {
+			String providedCode = request.getAdminCode() == null ? "" : request.getAdminCode().trim();
+			if (adminRegistrationCode.isEmpty() || !adminRegistrationCode.equals(providedCode)) {
+				throw new IllegalArgumentException("Invalid admin registration code");
+			}
 		}
-		Set<AppRole> roles = roleNames.stream().map(this::getOrCreateRole).collect(java.util.stream.Collectors.toSet());
+
+		Set<AppRole> roles = Set.of(getOrCreateRole(requestedRole));
 
 		AppUser user = new AppUser();
 		user.setEmail(request.getEmail());

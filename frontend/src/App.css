@@ -1,42 +1,181 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+:root {
+  font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+  color: #132032;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 15%, #f9d976 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, #90f7ec 0%, transparent 40%),
+    linear-gradient(145deg, #f3f7ff 0%, #e7f2ff 50%, #f0f9ff 100%);
+}
+
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: min(520px, 100%);
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 18px 40px rgba(24, 46, 84, 0.14);
+}
+
+.title {
+  margin: 0 0 18px;
+  font-size: 1.7rem;
+}
+
+.switch-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.switch-btn {
+  border: 1px solid #cdd8ec;
+  border-radius: 10px;
+  padding: 10px;
+  background: #f6f9ff;
+  color: #2c466b;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.switch-btn.active {
+  background: #264f87;
+  border-color: #264f87;
+  color: #ffffff;
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: #27405f;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid #bfd0e8;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  background: #fbfdff;
+  color: #132032;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #99bbf3;
+  border-color: #6d98dc;
+}
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  background: linear-gradient(135deg, #12689d, #2f8a68);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.panel {
+  display: grid;
+  gap: 12px;
+}
+
+.welcome {
+  margin: 0;
+}
+
+.badge {
+  margin: 0;
+  padding: 6px 10px;
+  width: fit-content;
+  border-radius: 999px;
+  background: #e9f2ff;
+  color: #234a7c;
+  font-weight: 700;
+}
+
+.route-box {
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid transparent;
+}
+
+.route-box h2 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+}
+
+.route-box p {
+  margin: 0;
+}
+
+.route-box.admin {
+  background: #fff4e7;
+  border-color: #ffd59d;
+}
+
+.route-box.user {
+  background: #ebfff6;
+  border-color: #a8ebc9;
+}
+
+.token-label {
+  margin: 2px 0 0;
+  font-size: 0.86rem;
+  color: #4c6788;
+}
+
+.token {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.feedback {
+  margin: 14px 0 0;
+  font-weight: 600;
+}
+
+.feedback.success {
+  color: #166a3e;
+}
+
+.feedback.error {
+  color: #b42318;
+}
+
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 20px;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
