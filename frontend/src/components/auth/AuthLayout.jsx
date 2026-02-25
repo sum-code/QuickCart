@@ -8,7 +8,7 @@ function AuthLayout({ title, subtitle, children }) {
       <section className="relative mx-auto w-full max-w-md rounded-3xl border border-white/10 bg-white/95 p-8 shadow-premium backdrop-blur-sm">
         <div className="mb-6">
           <p className="mb-2 inline-flex rounded-full bg-brand-ink px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-white">
-            QuickCart Secure Access
+            QuickCart
           </p>
           <h1 className="text-3xl font-semibold text-brand-ink">{title}</h1>
           <p className="mt-2 text-sm text-slate-600">{subtitle}</p>

@@ -1,17 +1,26 @@
+function normalizeRole(role) {
+  if (!role || typeof role !== 'string') {
+    return null
+  }
+
+  return role.startsWith('ROLE_') ? role.substring(5) : role
+}
+
 export function getPrimaryRole(user) {
   if (!user?.roles || !Array.isArray(user.roles) || user.roles.length === 0) {
     return 'USER'
   }
 
-  return user.roles.includes('ADMIN') ? 'ADMIN' : user.roles[0]
+  const normalizedRoles = user.roles.map(normalizeRole).filter(Boolean)
+  return normalizedRoles.includes('ADMIN') ? 'ADMIN' : normalizedRoles[0]
 }
 
-export function isAdmin(user) {
+export function hasAdminRole(user) {
   return getPrimaryRole(user) === 'ADMIN'
 }
 
 export function getAuthRedirectPath(user) {
-  return isAdmin(user) ? '/admin/dashboard' : '/'
+  return hasAdminRole(user) ? '/admin/dashboard' : '/'
 }
 
 export function getErrorMessage(error, fallback = 'Something went wrong. Please try again.') {

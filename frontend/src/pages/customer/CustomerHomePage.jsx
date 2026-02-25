@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/useAuthStore'
-import { isAdmin } from '../../utils/auth'
+import { hasAdminRole } from '../../utils/auth'
 
 function CustomerHomePage() {
   const navigate = useNavigate()
@@ -20,7 +20,7 @@ function CustomerHomePage() {
         <p className="mt-3 text-slate-100">Logged in as {user?.email}</p>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          {isAdmin(user) && (
+          {hasAdminRole(user) && (
             <button
               onClick={() => navigate('/admin/dashboard')}
               className="rounded-xl border border-white/30 px-4 py-2 text-sm font-medium hover:bg-white/15"

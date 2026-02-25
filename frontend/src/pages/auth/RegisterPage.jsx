@@ -4,6 +4,7 @@ import AuthLayout from '../../components/auth/AuthLayout'
 import AuthInput from '../../components/auth/AuthInput'
 import SubmitButton from '../../components/ui/SubmitButton'
 import FormMessage from '../../components/ui/FormMessage'
+import GoogleLoginButton from '../../components/auth/GoogleLoginButton'
 import { registerRequest } from '../../services/authService'
 import { useAuthStore } from '../../store/useAuthStore'
 import { getAuthRedirectPath, getErrorMessage } from '../../utils/auth'
@@ -102,6 +103,14 @@ function RegisterPage() {
         <SubmitButton label="Create Account" loading={loading} />
         <FormMessage error={error} />
       </form>
+
+      <div className="my-6 flex items-center gap-3">
+        <div className="h-px flex-1 bg-slate-300" />
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">or</span>
+        <div className="h-px flex-1 bg-slate-300" />
+      </div>
+
+      <GoogleLoginButton label="Sign up with Google" />
 
       <p className="mt-6 text-sm text-slate-600">
         Already have an account?{' '}
