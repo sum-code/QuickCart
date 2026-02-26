@@ -15,7 +15,7 @@ function NotFoundPage() {
         <h1 className="mt-2 text-2xl font-semibold">Page not found</h1>
         <Link to={fallbackPath} className="mt-5 inline-block rounded-lg bg-brand-ocean px-4 py-2 text-sm font-medium">
           Back to app
-        </Link>
+        </Link> 
       </section>
     </main>
   )

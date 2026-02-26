@@ -1,5 +1,7 @@
 package com.quickcart.common;
 
+import com.quickcart.product.exception.ProductNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -23,8 +25,13 @@ public class GlobalExceptionHandler {
 		return build(HttpStatus.BAD_REQUEST, message, request);
 	}
 
-	@ExceptionHandler({IllegalArgumentException.class, DataIntegrityViolationException.class})
-	public ResponseEntity<ApiError> handleBadRequest(RuntimeException ex, HttpServletRequest request) {
+	@ExceptionHandler(ProductNotFoundException.class)
+	public ResponseEntity<ApiError> handleProductNotFound(ProductNotFoundException ex, HttpServletRequest request) {
+		return build(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+	}
+
+	@ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class, DataIntegrityViolationException.class, JsonProcessingException.class})
+	public ResponseEntity<ApiError> handleBadRequest(Exception ex, HttpServletRequest request) {
 		return build(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
 	}
 

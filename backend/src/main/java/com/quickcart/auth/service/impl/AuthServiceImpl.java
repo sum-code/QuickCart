@@ -20,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -51,16 +53,27 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	@Transactional
 	public AuthResponse register(RegisterRequest request) {
-		if (userRepository.existsByEmail(request.getEmail())) {
-			throw new IllegalArgumentException("Email already registered");
+		Role requestedRole = request.getRole() == null ? Role.USER : request.getRole();
+		Optional<AppUser> existingUserOptional = userRepository.findByEmail(request.getEmail());
+
+		if (existingUserOptional.isPresent()) {
+			if (requestedRole != Role.ADMIN) {
+				throw new IllegalArgumentException("Email already registered");
+			}
+
+			validateAdminCode(request.getAdminCode());
+
+			AppUser existingUser = existingUserOptional.get();
+			Set<AppRole> updatedRoles = new HashSet<>(existingUser.getRoles());
+			updatedRoles.add(getOrCreateRole(Role.ADMIN));
+			existingUser.setRoles(updatedRoles);
+
+			AppUser saved = userRepository.save(existingUser);
+			return buildAuthResponse(saved);
 		}
 
-		Role requestedRole = request.getRole() == null ? Role.USER : request.getRole();
 		if (requestedRole == Role.ADMIN) {
-			String providedCode = request.getAdminCode() == null ? "" : request.getAdminCode().trim();
-			if (adminRegistrationCode.isEmpty() || !adminRegistrationCode.equals(providedCode)) {
-				throw new IllegalArgumentException("Invalid admin registration code");
-			}
+			validateAdminCode(request.getAdminCode());
 		}
 
 		Set<AppRole> roles = Set.of(getOrCreateRole(requestedRole));
@@ -71,9 +84,7 @@ public class AuthServiceImpl implements AuthService {
 		user.setRoles(roles);
 
 		AppUser saved = userRepository.save(user);
-		Set<Role> savedRoleNames = saved.getRoles().stream().map(AppRole::getName).collect(java.util.stream.Collectors.toSet());
-		String token = jwtService.generateToken(saved.getEmail(), savedRoleNames);
-		return new AuthResponse(token, new UserResponse(saved.getId(), saved.getEmail(), savedRoleNames));
+		return buildAuthResponse(saved);
 	}
 
 	@Override
@@ -88,7 +99,17 @@ public class AuthServiceImpl implements AuthService {
 
 		AppUser user = userRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+		return buildAuthResponse(user);
+	}
 
+	private void validateAdminCode(String providedCodeRaw) {
+		String providedCode = providedCodeRaw == null ? "" : providedCodeRaw.trim();
+		if (adminRegistrationCode.isEmpty() || !adminRegistrationCode.equals(providedCode)) {
+			throw new IllegalArgumentException("Invalid admin registration code");
+		}
+	}
+
+	private AuthResponse buildAuthResponse(AppUser user) {
 		Set<Role> roleNames = user.getRoles().stream().map(AppRole::getName).collect(java.util.stream.Collectors.toSet());
 		String token = jwtService.generateToken(user.getEmail(), roleNames);
 		return new AuthResponse(token, new UserResponse(user.getId(), user.getEmail(), roleNames));

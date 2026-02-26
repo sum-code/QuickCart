@@ -16,3 +16,18 @@
     min-height: 100vh;
   }
 }
+
+@layer components {
+  .input {
+    @apply w-full rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-slate-300 outline-none focus:border-brand-aurora;
+  }
+
+  .admin-filter-select {
+    color-scheme: dark;
+  }
+
+  .admin-filter-select option {
+    background-color: rgb(15 23 42);
+    color: rgb(226 232 240);
+  }
+}

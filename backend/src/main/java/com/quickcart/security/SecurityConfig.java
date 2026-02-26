@@ -26,8 +26,8 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/api/auth/**", "/oauth2/**", "/login/**").permitAll()
-						.requestMatchers("/api/admin/**").hasRole("ADMIN")
+						.requestMatchers("/api/auth/**", "/oauth2/**", "/login/**", "/api/v1/products/**").permitAll()
+						.requestMatchers("/api/admin/**", "/api/v1/admin/**").hasRole("ADMIN")
 						.requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
 						.anyRequest().authenticated()
 				)
@@ -46,3 +46,4 @@ public class SecurityConfig {
 		return configuration.getAuthenticationManager();
 	}
 }
+

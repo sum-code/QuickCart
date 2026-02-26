@@ -5,7 +5,7 @@ import AuthInput from '../../components/auth/AuthInput'
 import SubmitButton from '../../components/ui/SubmitButton'
 import FormMessage from '../../components/ui/FormMessage'
 import GoogleLoginButton from '../../components/auth/GoogleLoginButton'
-import { loginRequest } from '../../services/authService'
+import { getCurrentUserRequest, loginRequest } from '../../services/authService'
 import { useAuthStore } from '../../store/useAuthStore'
 import { getAuthRedirectPath, getErrorMessage } from '../../utils/auth'
 
@@ -33,7 +33,16 @@ function LoginPage() {
     try {
       const response = await loginRequest(form)
       setAuthSession(response)
-      navigate(getAuthRedirectPath(response.user), { replace: true })
+
+      let canonicalUser = response.user
+      try {
+        canonicalUser = await getCurrentUserRequest()
+        setAuthSession({ accessToken: response.accessToken, user: canonicalUser })
+      } catch {
+        setAuthSession(response)
+      }
+
+      navigate(getAuthRedirectPath(canonicalUser), { replace: true })
     } catch (requestError) {
       setError(getErrorMessage(requestError, 'Login failed.'))
     } finally {
