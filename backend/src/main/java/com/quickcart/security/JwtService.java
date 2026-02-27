@@ -5,6 +5,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +14,14 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Date;
 import java.util.Set;
 
 @Service
 public class JwtService {
+	private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
 
 	private final SecretKey secretKey;
 	private final long expirationMinutes;
@@ -46,11 +51,33 @@ public class JwtService {
 		return parseAllClaims(token).getSubject();
 	}
 
+	public Set<Role> extractRoles(String token) {
+		Claims claims = parseAllClaims(token);
+		Object rawRoles = claims.get("roles");
+		if (!(rawRoles instanceof Collection<?> collection)) {
+			return Set.of();
+		}
+
+		Set<Role> roles = new HashSet<>();
+		for (Object raw : collection) {
+			if (raw == null) {
+				continue;
+			}
+			try {
+				roles.add(Role.valueOf(String.valueOf(raw)));
+			} catch (IllegalArgumentException ignore) {
+				// Ignore unknown role values.
+			}
+		}
+		return roles;
+	}
+
 	public boolean isTokenValid(String token) {
 		try {
 			parseAllClaims(token);
 			return true;
 		} catch (Exception ex) {
+			logger.debug("Invalid JWT: {}", ex.getMessage());
 			return false;
 		}
 	}

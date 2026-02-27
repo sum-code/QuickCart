@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import AdminSidebar from '../../components/admin/AdminSidebar'
 import ProductModal from '../../components/admin/ProductModal'
 import ProductTable from '../../components/admin/ProductTable'
 import PaginationBar from '../../components/admin/PaginationBar'
+import AdminOrderTable from '../../components/admin/AdminOrderTable'
+import OrderStatusModal from '../../components/admin/OrderStatusModal'
 import ErrorPanel from '../../components/ui/ErrorPanel'
 import { useAuthStore } from '../../store/useAuthStore'
 import { createProduct, deleteProduct, listProducts, updateProduct } from '../../services/productService'
+import { getAdminOrders, updateAdminOrderStatus } from '../../services/orderService'
 import { formatCurrency, optimizeCloudinaryUrl } from '../../utils/product'
 import { getErrorMessage } from '../../utils/auth'
 
@@ -25,6 +29,11 @@ function AdminDashboardPage() {
   const [page, setPage] = useState(0)
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortDirection, setSortDirection] = useState('desc')
+  const [orders, setOrders] = useState([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
+  const [ordersError, setOrdersError] = useState('')
+  const [statusSaving, setStatusSaving] = useState(false)
+  const [statusModal, setStatusModal] = useState({ open: false, order: null })
 
   const [modalState, setModalState] = useState({ open: false, mode: 'create', product: null })
 
@@ -52,13 +61,33 @@ function AdminDashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, sortDirection])
 
+  useEffect(() => {
+    if (activeView === 'orders') {
+      fetchOrders()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeView])
+
+  const fetchOrders = async () => {
+    setOrdersLoading(true)
+    setOrdersError('')
+    try {
+      const allOrders = await getAdminOrders()
+      setOrders(allOrders)
+    } catch (err) {
+      setOrdersError(getErrorMessage(err, 'Unable to load orders.'))
+    } finally {
+      setOrdersLoading(false)
+    }
+  }
+
   const mappedRows = useMemo(() => {
     const rows = productsPage?.content || []
     return rows.map((product) => ({
       raw: product,
       id: product.id,
       name: product.name,
-      sku: product.sku,
+      brand: product.brand,
       category: product.category,
       stockQuantity: product.stockQuantity,
       priceText: formatCurrency(product.price),
@@ -116,6 +145,30 @@ function AdminDashboardPage() {
     navigate('/auth/login', { replace: true })
   }
 
+  const submitStatusUpdate = async (payload) => {
+    const selectedOrder = statusModal.order
+    if (!selectedOrder) {
+      return
+    }
+    const orderId = selectedOrder.id
+
+    const toastId = toast.loading('Updating order status...')
+    setStatusSaving(true)
+    setOrdersError('')
+    try {
+      const updated = await updateAdminOrderStatus(orderId, payload)
+      setOrders((previous) => previous.map((order) => (order.id === orderId ? updated : order)))
+      setStatusModal({ open: true, order: updated })
+      toast.success('Order status updated.', { id: toastId })
+    } catch (err) {
+      const message = getErrorMessage(err, 'Unable to update order status.')
+      setOrdersError(message)
+      toast.error(message, { id: toastId })
+    } finally {
+      setStatusSaving(false)
+    }
+  }
+
   return (
     <main className="flex min-h-screen bg-slate-900 text-white">
       <AdminSidebar
@@ -129,7 +182,9 @@ function AdminDashboardPage() {
         <div className="mx-auto max-w-7xl">
           <header className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-brand-copper">Inventory Management</p>
+              <p className="text-xs uppercase tracking-[0.16em] text-brand-copper">
+                {activeView === 'inventory' ? 'Inventory Management' : activeView === 'orders' ? 'Order Fulfillment' : 'Analytics'}
+              </p>
               <h1 className="mt-2 text-3xl font-semibold">Welcome, {user?.email}</h1>
             </div>
             <div className="flex gap-3">
@@ -198,6 +253,25 @@ function AdminDashboardPage() {
                 onChange={onPageChange}
               />
             </section>
+          ) : activeView === 'orders' ? (
+            <section className="mt-8 space-y-4">
+              <div className="flex justify-end">
+                <button
+                  onClick={fetchOrders}
+                  className="rounded-xl border border-white/20 bg-slate-800/80 px-3 py-2 text-sm text-slate-100"
+                >
+                  Refresh Orders
+                </button>
+              </div>
+
+              {ordersError && <ErrorPanel message={ordersError} onRetry={fetchOrders} />}
+
+              <AdminOrderTable
+                orders={orders}
+                loading={ordersLoading}
+                onUpdateStatus={(order) => setStatusModal({ open: true, order })}
+              />
+            </section>
           ) : (
             <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-8 text-slate-300">
               Analytics widgets can be added here next.
@@ -213,6 +287,14 @@ function AdminDashboardPage() {
         onClose={() => setModalState({ open: false, mode: 'create', product: null })}
         onSubmit={onModalSubmit}
         loading={saving}
+      />
+
+      <OrderStatusModal
+        isOpen={statusModal.open}
+        order={statusModal.order}
+        onClose={() => setStatusModal({ open: false, order: null })}
+        onSubmit={submitStatusUpdate}
+        loading={statusSaving}
       />
     </main>
   )

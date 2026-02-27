@@ -14,12 +14,20 @@ function OAuth2CallbackPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const run = async () => {
+    let isCancelled = false
+
+    const readParams = () => {
       const params = new URLSearchParams(window.location.search)
-      const token = params.get('token')
-      const email = params.get('email')
-      const rolesParam = params.get('roles')
-      const oauthError = params.get('error')
+      return {
+        token: params.get('token'),
+        email: params.get('email'),
+        rolesParam: params.get('roles'),
+        oauthError: params.get('error'),
+      }
+    }
+
+    const run = async () => {
+      let { token, email, rolesParam, oauthError } = readParams()
 
       if (oauthError) {
         setError('Google login failed. Please try again.')
@@ -27,8 +35,20 @@ function OAuth2CallbackPage() {
       }
 
       if (!token) {
-        setError('Missing token from Google login callback.')
-        return
+        // Give the redirect a moment to populate query params to avoid error flashes.
+        await new Promise((resolve) => setTimeout(resolve, 250))
+        if (isCancelled) {
+          return
+        }
+        ;({ token, email, rolesParam, oauthError } = readParams())
+        if (oauthError) {
+          setError('Google login failed. Please try again.')
+          return
+        }
+        if (!token) {
+          setError('Missing token from Google login callback.')
+          return
+        }
       }
 
       const roles = rolesParam
@@ -57,6 +77,9 @@ function OAuth2CallbackPage() {
     }
 
     run()
+    return () => {
+      isCancelled = true
+    }
   }, [clearAuth, navigate, setAuthSession])
 
   return (

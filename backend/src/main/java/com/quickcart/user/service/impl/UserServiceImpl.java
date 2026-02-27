@@ -6,8 +6,11 @@ import com.quickcart.user.entity.AppUser;
 import com.quickcart.user.entity.Role;
 import com.quickcart.user.repository.AppUserRepository;
 import com.quickcart.user.service.UserService;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +31,30 @@ public class UserServiceImpl implements UserService {
 	@Transactional(readOnly = true)
 	public AppUser getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || authentication.getName() == null) {
-			throw new IllegalStateException("No authenticated user");
+		if (authentication == null) {
+			throw new BadCredentialsException("Not authenticated");
 		}
-		String email = authentication.getName();
+
+		String email = resolveEmail(authentication);
+		if (email == null || email.isBlank() || "anonymousUser".equalsIgnoreCase(email)) {
+			throw new BadCredentialsException("Not authenticated");
+		}
 		return userRepository.findByEmail(email)
-				.orElseThrow(() -> new IllegalArgumentException("User not found"));
+				.orElseThrow(() -> new BadCredentialsException("User not found"));
+	}
+
+	private String resolveEmail(Authentication authentication) {
+		Object principal = authentication.getPrincipal();
+		if (principal instanceof UserDetails userDetails) {
+			return userDetails.getUsername();
+		}
+		if (principal instanceof OAuth2User oauth2User) {
+			String email = oauth2User.getAttribute("email");
+			if (email != null) {
+				return email;
+			}
+		}
+		return authentication.getName();
 	}
 
 	@Override

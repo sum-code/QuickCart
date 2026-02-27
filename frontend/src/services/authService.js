@@ -18,3 +18,8 @@ export async function getCurrentUserRequest() {
   const { data } = await apiClient.get('/user/me')
   return data
 }
+
+export async function logoutRequest() {
+  const { data } = await apiClient.post('/auth/logout')
+  return data
+}

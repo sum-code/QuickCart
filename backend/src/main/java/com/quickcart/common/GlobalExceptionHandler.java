@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,6 +39,11 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
 	public ResponseEntity<ApiError> handleUnauthorized(RuntimeException ex, HttpServletRequest request) {
 		return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+	}
+
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+		return build(HttpStatus.FORBIDDEN, ex.getMessage(), request);
 	}
 
 	@ExceptionHandler(Exception.class)
