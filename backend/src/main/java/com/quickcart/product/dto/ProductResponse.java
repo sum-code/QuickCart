@@ -6,28 +6,32 @@ import java.time.Instant;
 public class ProductResponse {
 	private Long id;
 	private String name;
-	private String sku;
+	private String brand;
 	private String description;
 	private BigDecimal price;
 	private Integer stockQuantity;
 	private String imageUrl;
 	private String category;
+	private Double averageRating;
+	private Long reviewCount;
 	private Instant createdAt;
 	private Instant updatedAt;
 
 	public ProductResponse() {
 	}
 
-	public ProductResponse(Long id, String name, String sku, String description, BigDecimal price, Integer stockQuantity,
-						 String imageUrl, String category, Instant createdAt, Instant updatedAt) {
+	public ProductResponse(Long id, String name, String brand, String description, BigDecimal price, Integer stockQuantity,
+						 String imageUrl, String category, Double averageRating, Long reviewCount, Instant createdAt, Instant updatedAt) {
 		this.id = id;
 		this.name = name;
-		this.sku = sku;
+		this.brand = brand;
 		this.description = description;
 		this.price = price;
 		this.stockQuantity = stockQuantity;
 		this.imageUrl = imageUrl;
 		this.category = category;
+		this.averageRating = averageRating;
+		this.reviewCount = reviewCount;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 	}
@@ -48,12 +52,12 @@ public class ProductResponse {
 		this.name = name;
 	}
 
-	public String getSku() {
-		return sku;
+	public String getBrand() {
+		return brand;
 	}
 
-	public void setSku(String sku) {
-		this.sku = sku;
+	public void setBrand(String brand) {
+		this.brand = brand;
 	}
 
 	public String getDescription() {
@@ -94,6 +98,22 @@ public class ProductResponse {
 
 	public void setCategory(String category) {
 		this.category = category;
+	}
+
+	public Double getAverageRating() {
+		return averageRating;
+	}
+
+	public void setAverageRating(Double averageRating) {
+		this.averageRating = averageRating;
+	}
+
+	public Long getReviewCount() {
+		return reviewCount;
+	}
+
+	public void setReviewCount(Long reviewCount) {
+		this.reviewCount = reviewCount;
 	}
 
 	public Instant getCreatedAt() {

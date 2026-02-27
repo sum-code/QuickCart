@@ -13,7 +13,7 @@ function ProductTable({ rows, onEdit, onDelete, loading }) {
         <thead className="bg-slate-950/70 text-left text-xs uppercase tracking-[0.12em] text-slate-400">
           <tr>
             <th className="px-4 py-3">Product</th>
-            <th className="px-4 py-3">SKU</th>
+            <th className="px-4 py-3">Brand</th>
             <th className="px-4 py-3">Category</th>
             <th className="px-4 py-3">Price</th>
             <th className="px-4 py-3">Stock</th>
@@ -29,7 +29,7 @@ function ProductTable({ rows, onEdit, onDelete, loading }) {
                   <span>{product.name}</span>
                 </div>
               </td>
-              <td className="px-4 py-3 text-slate-300">{product.sku}</td>
+              <td className="px-4 py-3 text-slate-300">{product.brand}</td>
               <td className="px-4 py-3 text-slate-300">{product.category}</td>
               <td className="px-4 py-3">{product.priceText}</td>
               <td className="px-4 py-3">{product.stockQuantity}</td>

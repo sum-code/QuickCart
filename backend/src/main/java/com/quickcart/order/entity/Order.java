@@ -39,6 +39,12 @@ public class Order {
 	@Column(nullable = false, precision = 19, scale = 2)
 	private BigDecimal totalAmount;
 
+	@Column(length = 120)
+	private String courierName;
+
+	@Column(length = 180)
+	private String trackingNumber;
+
 	@Column(nullable = false, updatable = false)
 	private Instant createdAt;
 
@@ -84,6 +90,22 @@ public class Order {
 
 	public Instant getCreatedAt() {
 		return createdAt;
+	}
+
+	public String getCourierName() {
+		return courierName;
+	}
+
+	public void setCourierName(String courierName) {
+		this.courierName = courierName;
+	}
+
+	public String getTrackingNumber() {
+		return trackingNumber;
+	}
+
+	public void setTrackingNumber(String trackingNumber) {
+		this.trackingNumber = trackingNumber;
 	}
 
 	public List<OrderItem> getItems() {

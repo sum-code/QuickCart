@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 const emptyForm = {
   name: '',
-  sku: '',
+  brand: '',
   description: '',
   price: '',
   stockQuantity: '',
@@ -24,7 +24,7 @@ function ProductModal({ isOpen, mode, initialProduct, onClose, onSubmit, loading
 
     setForm({
       name: initialProduct.name ?? '',
-      sku: initialProduct.sku ?? '',
+      brand: initialProduct.brand ?? '',
       description: initialProduct.description ?? '',
       price: initialProduct.price ?? '',
       stockQuantity: initialProduct.stockQuantity ?? '',
@@ -74,7 +74,7 @@ function ProductModal({ isOpen, mode, initialProduct, onClose, onSubmit, loading
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <input name="name" value={form.name} onChange={handleChange} placeholder="Name" className="input" required />
-          <input name="sku" value={form.sku} onChange={handleChange} placeholder="SKU" className="input" required />
+          <input name="brand" value={form.brand} onChange={handleChange} placeholder="Brand" className="input" required />
           <input name="category" value={form.category} onChange={handleChange} placeholder="Category" className="input" required />
           <input
             name="price"

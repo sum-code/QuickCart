@@ -16,7 +16,7 @@ public class ProductUpsertRequest {
 
 	@NotBlank
 	@Size(max = 64)
-	private String sku;
+	private String brand;
 
 	@Size(max = 2000)
 	private String description;
@@ -41,12 +41,12 @@ public class ProductUpsertRequest {
 		this.name = name;
 	}
 
-	public String getSku() {
-		return sku;
+	public String getBrand() {
+		return brand;
 	}
 
-	public void setSku(String sku) {
-		this.sku = sku;
+	public void setBrand(String brand) {
+		this.brand = brand;
 	}
 
 	public String getDescription() {

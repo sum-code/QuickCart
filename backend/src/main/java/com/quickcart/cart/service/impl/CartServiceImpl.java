@@ -40,12 +40,13 @@ public class CartServiceImpl implements CartService {
 	@Override
 	@Transactional
 	public CartResponse add(AddToCartRequest request) {
+		if (request.getQuantity() == null || request.getQuantity() < 1) {
+			throw new IllegalArgumentException("Quantity must be >= 1");
+		}
+
 		AppUser user = userService.getCurrentUser();
 		Product product = productRepository.findById(request.getProductId())
 				.orElseThrow(() -> new IllegalArgumentException("Product not found"));
-		if (product.getStock() == null || product.getStock() < request.getQuantity()) {
-			throw new IllegalArgumentException("Insufficient stock");
-		}
 
 		CartItem item = cartItemRepository.findByUserIdAndProductId(user.getId(), product.getId())
 				.orElseGet(() -> {
@@ -56,7 +57,13 @@ public class CartServiceImpl implements CartService {
 					return ci;
 				});
 
-		item.setQuantity(item.getQuantity() + request.getQuantity());
+		int currentQuantity = item.getQuantity() == null ? 0 : item.getQuantity();
+		int nextQuantity = currentQuantity + request.getQuantity();
+		if (product.getStock() == null || product.getStock() < nextQuantity) {
+			throw new IllegalArgumentException("Insufficient stock");
+		}
+
+		item.setQuantity(nextQuantity);
 		cartItemRepository.save(item);
 
 		return getCart();

@@ -26,8 +26,8 @@ public class Product {
 	@Column(nullable = false, length = 120)
 	private String name;
 
-	@Column(nullable = false, unique = true, length = 64)
-	private String sku;
+	@Column(name = "sku", nullable = false, unique = true, length = 64)
+	private String brand;
 
 	@Column(length = 2000)
 	private String description;
@@ -68,12 +68,12 @@ public class Product {
 		this.name = name;
 	}
 
-	public String getSku() {
-		return sku;
+	public String getBrand() {
+		return brand;
 	}
 
-	public void setSku(String sku) {
-		this.sku = sku;
+	public void setBrand(String brand) {
+		this.brand = brand;
 	}
 
 	public String getDescription() {

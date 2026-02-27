@@ -1,6 +1,7 @@
 function AdminSidebar({ collapsed, onToggle, activeView, setActiveView }) {
   const nav = [
     { id: 'inventory', label: 'Inventory' },
+    { id: 'orders', label: 'Orders' },
     { id: 'analytics', label: 'Analytics' },
   ]
 

@@ -32,7 +32,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 	@Override
 	@Transactional
 	public ProductResponse create(ProductUpsertRequest request, MultipartFile image) {
-		validateUniqueSkuForCreate(request.getSku());
+		validateUniqueBrandForCreate(request.getBrand());
 		Product product = productMapper.toEntity(request);
 		if (image != null && !image.isEmpty()) {
 			product.setImageUrl(imageUploadService.upload(image));
@@ -44,7 +44,7 @@ public class AdminProductServiceImpl implements AdminProductService {
 	@Transactional
 	public ProductResponse update(Long id, ProductUpsertRequest request, MultipartFile image) {
 		Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
-		validateUniqueSkuForUpdate(request.getSku(), id);
+		validateUniqueBrandForUpdate(request.getBrand(), id);
 		productMapper.apply(product, request);
 		if (image != null && !image.isEmpty()) {
 			product.setImageUrl(imageUploadService.upload(image));
@@ -61,15 +61,15 @@ public class AdminProductServiceImpl implements AdminProductService {
 		productRepository.deleteById(id);
 	}
 
-	private void validateUniqueSkuForCreate(String sku) {
-		if (productRepository.existsBySkuIgnoreCase(sku)) {
-			throw new IllegalArgumentException("SKU already exists: " + sku);
+	private void validateUniqueBrandForCreate(String brand) {
+		if (productRepository.existsByBrandIgnoreCase(brand)) {
+			throw new IllegalArgumentException("Brand already exists: " + brand);
 		}
 	}
 
-	private void validateUniqueSkuForUpdate(String sku, Long id) {
-		if (productRepository.existsBySkuIgnoreCaseAndIdNot(sku, id)) {
-			throw new IllegalArgumentException("SKU already exists: " + sku);
+	private void validateUniqueBrandForUpdate(String brand, Long id) {
+		if (productRepository.existsByBrandIgnoreCaseAndIdNot(brand, id)) {
+			throw new IllegalArgumentException("Brand already exists: " + brand);
 		}
 	}
 }

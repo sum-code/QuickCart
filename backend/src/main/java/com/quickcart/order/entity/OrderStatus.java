@@ -1,9 +1,12 @@
 package com.quickcart.order.entity;
 
 public enum OrderStatus {
-	PENDING,
-	PAID,
+	PLACED,
+	PROCESSING,
 	SHIPPED,
 	DELIVERED,
+	RETURN_REQUESTED,
+	RETURN_APPROVED,
+	REFUNDED,
 	CANCELLED
 }

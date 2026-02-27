@@ -23,3 +23,16 @@ export function formatCurrency(value) {
     maximumFractionDigits: 2,
   }).format(numeric)
 }
+
+export function normalizeRating(value) {
+  const numeric = Number(value)
+  if (Number.isNaN(numeric) || numeric < 0) {
+    return 0
+  }
+  return Math.min(5, numeric)
+}
+
+export function getRatingStars(rating) {
+  const normalized = normalizeRating(rating)
+  return Array.from({ length: 5 }, (_, index) => index < Math.round(normalized))
+}

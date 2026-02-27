@@ -37,3 +37,13 @@ export async function updateProduct(id, payload, imageFile) {
 export async function deleteProduct(id) {
   await apiClient.delete(`/v1/admin/products/${id}`)
 }
+
+export async function listProductReviews(productId) {
+  const { data } = await apiClient.get(`/v1/products/${productId}/reviews`)
+  return data
+}
+
+export async function createProductReview(productId, payload) {
+  const { data } = await apiClient.post(`/v1/products/${productId}/reviews`, payload)
+  return data
+}
