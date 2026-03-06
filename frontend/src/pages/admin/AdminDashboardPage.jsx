@@ -274,7 +274,7 @@ function AdminDashboardPage() {
             </section>
           ) : (
             <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-8 text-slate-300">
-              Analytics widgets can be added here next.
+              
             </section>
           )}
         </div>
